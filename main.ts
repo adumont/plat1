@@ -1,6 +1,12 @@
+controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
+    if (mySprite.vy == 0) {
+        mySprite.vy = -150
+    }
+})
+let mySprite: Sprite = null
 scene.setBackgroundColor(9)
 tiles.setTilemap(tilemap`level1`)
-let mySprite = sprites.create(img`
+mySprite = sprites.create(img`
     . . . . . . f f f f . . . . . . 
     . . . . f f f 2 2 f f f . . . . 
     . . . f f f 2 2 2 2 f f f . . . 
@@ -19,12 +25,18 @@ let mySprite = sprites.create(img`
     . . . . . f f . . f f . . . . . 
     `, SpriteKind.Player)
 scene.cameraFollowSprite(mySprite)
-tiles.placeOnRandomTile(mySprite, assets.tile`tile3`)
-for (let value of tiles.getTilesByType(assets.tile`tile3`)) {
+tiles.placeOnRandomTile(mySprite, assets.tile`tile6`)
+for (let value of tiles.getTilesByType(assets.tile`tile6`)) {
     tiles.setTileAt(value, assets.tile`transparency16`)
 }
+controller.moveSprite(mySprite, 100, 0)
 mySprite.ay = 300
-controller.moveSprite(mySprite)
 game.onUpdate(function () {
-	
+    if (mySprite.tileKindAt(TileDirection.Center, assets.tile`tile3`) || mySprite.tileKindAt(TileDirection.Center, assets.tile`tile4`) || mySprite.tileKindAt(TileDirection.Bottom, assets.tile`tile4`)) {
+        mySprite.ay = 0
+        controller.moveSprite(mySprite, 50, 50)
+    } else {
+        controller.moveSprite(mySprite, 100, 0)
+        mySprite.ay = 300
+    }
 })
