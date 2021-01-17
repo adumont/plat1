@@ -35,7 +35,8 @@ game.onUpdate(function () {
     if (mySprite.tileKindAt(TileDirection.Center, assets.tile`tile3`) || mySprite.tileKindAt(TileDirection.Center, assets.tile`tile4`) || mySprite.tileKindAt(TileDirection.Bottom, assets.tile`tile4`)) {
         mySprite.ay = 0
         controller.moveSprite(mySprite, 50, 50)
-    } else {
+    }
+    if (mySprite.tileKindAt(TileDirection.Center, assets.tile`transparency16`)) {
         controller.moveSprite(mySprite, 100, 0)
         mySprite.ay = 300
     }
