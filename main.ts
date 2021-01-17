@@ -245,7 +245,7 @@ game.onUpdate(function () {
                 . . f f f f f f f f f f f f f . 
                 `)
         }
-        if (!(value.tileKindAt(TileDirection.Bottom, assets.tile`tile1`) || value.tileKindAt(TileDirection.Bottom, assets.tile`tile4`))) {
+        if (value.tileKindAt(TileDirection.Bottom, assets.tile`transparency16`) || value.tileKindAt(TileDirection.Bottom, assets.tile`tile2`)) {
             value.vx = 0 - value.vx
         }
     }
