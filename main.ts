@@ -1,23 +1,49 @@
 namespace SpriteKind {
     export const Monkey = SpriteKind.create()
+    export const Egg = SpriteKind.create()
 }
+scene.onOverlapTile(SpriteKind.Egg, assets.tile`transparency16`, function (sprite, location) {
+    sprite.destroy(effects.coolRadial, 200)
+    Monkey = sprites.create(img`
+        . . . . f f f f f . . . . . . . 
+        . . . f e e e e e f . . . . . . 
+        . . f d d d d e e e f . . . . . 
+        . c d f d d f d e e f f . . . . 
+        . c d f d d f d e e d d f . . . 
+        c d e e d d d d e e b d c . . . 
+        c d d d d c d d e e b d c . . . 
+        c c c c c d d e e e f c . . . . 
+        . f d d d d e e e f f . . . . . 
+        . . f e e e f f e e e f . . . . 
+        . . f f f f f e e e e e f . f f 
+        . . f d b f e e f f e e f . e f 
+        . f f d d f e f f e e e f . e f 
+        . f f f f f f e b b f e f f e f 
+        . f d d f e e e d d b e f f f f 
+        . . f f f f f f f f f f f f f . 
+        `, SpriteKind.Monkey)
+    tiles.placeOnTile(Monkey, location)
+    Monkey.setFlag(SpriteFlag.BounceOnWall, true)
+    Monkey.vx = -10
+})
 sprites.onOverlap(SpriteKind.Player, SpriteKind.Monkey, function (sprite, otherSprite) {
     // Falling on top of Monkey
     if (sprite.y < otherSprite.y && sprite.vy > 0) {
         info.changeScoreBy(5)
         // rebotar
-        sprite.vy = -100
+        sprite.vy = -80
         music.baDing.play()
     } else {
         info.changeLifeBy(-1)
     }
-    otherSprite.destroy(effects.disintegrate, 100)
+    otherSprite.destroy(effects.disintegrate, 200)
 })
 controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
-    if (mySprite.vy == 0) {
+    if (mySprite.vy == 0 && !(mySprite.tileKindAt(TileDirection.Center, assets.tile`tile3`))) {
         mySprite.vy = -150
     }
 })
+let anEgg: Sprite = null
 let Monkey: Sprite = null
 let mySprite: Sprite = null
 scene.setBackgroundImage(img`
@@ -107,7 +133,7 @@ scene.setBackgroundImage(img`
     dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd888888dddddddddddddddddddddddddddddddddddddd
     ddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd888888ddddddddddddddddddddddddddddddddddddddd
     ddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd8888ddddddddddddddddddddddddddddddddddddddddd
-    ddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd5dddddddddddd8888dddddddddddddddddddddddddddddddddddddddddd
+    dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd8888dddddddddddddddddddddddddddddddddddddddddd
     ddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd88888dddddddddddddddddddddddddddddddddddddddddd
     ddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd8888ddddddddddddddddddddddddddddddddddddddddddd
     ddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd888dddddddddddddddddddddddddddddddddddddddddddd
@@ -204,6 +230,7 @@ game.onUpdate(function () {
         mySprite.ay = 300
     }
 })
+// Monkey logic
 game.onUpdate(function () {
     for (let value of sprites.allOfKind(SpriteKind.Monkey)) {
         if (Math.trunc(value.x % 2) == 1) {
@@ -245,8 +272,36 @@ game.onUpdate(function () {
                 . . f f f f f f f f f f f f f . 
                 `)
         }
+        if (value.vx > 0) {
+            value.image.flipX()
+        }
         if (value.tileKindAt(TileDirection.Bottom, assets.tile`transparency16`) || value.tileKindAt(TileDirection.Bottom, assets.tile`tile2`)) {
             value.vx = 0 - value.vx
         }
+    }
+})
+game.onUpdateInterval(5000, function () {
+    if (sprites.allOfKind(SpriteKind.Monkey).length < 3) {
+        anEgg = sprites.create(img`
+            . . . . . . . . . . . . . . . . 
+            . . . . . . 4 4 4 4 . . . . . . 
+            . . . . 4 4 4 5 5 4 4 4 . . . . 
+            . . . 3 3 3 3 4 4 4 4 4 4 . . . 
+            . . 4 3 3 3 3 2 2 2 1 1 4 4 . . 
+            . . 3 3 3 3 3 2 2 2 1 1 5 4 . . 
+            . 4 3 3 3 3 2 2 2 2 2 5 5 4 4 . 
+            . 4 3 3 3 2 2 2 4 4 4 4 5 4 4 . 
+            . 4 4 3 3 2 2 4 4 4 4 4 4 4 4 . 
+            . 4 2 3 3 2 2 4 4 4 4 4 4 4 4 . 
+            . . 4 2 3 3 2 4 4 4 4 4 2 4 . . 
+            . . 4 2 2 3 2 2 4 4 4 2 4 4 . . 
+            . . . 4 2 2 2 2 2 2 2 2 4 . . . 
+            . . . . 4 4 2 2 2 2 4 4 . . . . 
+            . . . . . . 4 4 4 4 . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            `, SpriteKind.Egg)
+        tiles.placeOnRandomTile(anEgg, assets.tile`tile1`)
+        anEgg.vy = -150
+        anEgg.ay = 300
     }
 })
